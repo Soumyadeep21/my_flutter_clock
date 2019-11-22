@@ -1,13 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
-import 'package:ninja_clock/radial_painter.dart';
-import 'package:vector_math/vector_math_64.dart' as math;
-
-final radiansPerTick = math.radians(360 / 60);
-
-/// Total distance traveled by an hour hand, each hour, in radians.
-final radiansPerHour = math.radians(360 / 12);
+import 'package:ninja_clock/clock_body.dart';
 
 class MyClock extends StatefulWidget {
   final ClockModel model;
@@ -59,7 +53,7 @@ class _MyClockState extends State<MyClock> {
     });
   }
 
-  int toHour(int h) => h < 12 ? h : h - 12;
+  
 
   void _updateTime() {
     setState(() {
@@ -70,8 +64,6 @@ class _MyClockState extends State<MyClock> {
         Duration(seconds: 1) - Duration(milliseconds: _now.millisecond),
         _updateTime,
       );
-      print(toHour(_now.hour));
-      print(_now.minute * radiansPerTick);
     });
   }
 
@@ -80,50 +72,8 @@ class _MyClockState extends State<MyClock> {
     return Container(
       color: Color(0xff0B0B1B),
       //Second Radial
-      child: CustomPaint(
-        painter: RadialPainter(
-          angleRadians: _now.second * radiansPerTick,
-          thickness: 5.0,
-          position: 0.9,
-          colors: [
-            Colors.red,
-            Colors.blue,
-          ],
-        ),
-        //Minute Radial
-        child: CustomPaint(
-          painter: RadialPainter(
-            position: 0.8,
-            angleRadians: _now.minute * radiansPerTick,
-            thickness: 8.0,
-            colors: [
-              Colors.red,
-              Colors.blue,
-            ],
-          ),
-          //Hour Radial
-          child: CustomPaint(
-            painter: RadialPainter(
-              position: 0.7,
-              angleRadians: toHour(_now.hour) * radiansPerHour +
-                  (_now.minute / 60) * radiansPerHour,
-              thickness: 11.0,
-              colors: [
-                Colors.red,
-                Colors.blue,
-              ],
-            ),
-            child: Center(
-              child: Text(
-                '${widget.model.is24HourFormat ? _now.hour : toHour(_now.hour)}',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      child: ClockBody(now: _now, model: widget.model,),
     );
   }
 }
+
