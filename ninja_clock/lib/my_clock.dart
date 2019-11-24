@@ -85,8 +85,9 @@ class _MyClockState extends State<MyClock> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      color: Color(0xff0B0B1B),
+      color: isDark ? Color(0xff080D19) : Color(0xfffbf7f5),
       child: Stack(
         children: <Widget>[
           ClockBody(

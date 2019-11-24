@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
 import 'package:ninja_clock/components/radial_painter.dart';
-import 'package:ninja_clock/constants.dart';
+import 'package:ninja_clock/utils.dart';
 
 class ClockBody extends StatelessWidget {
   const ClockBody({
@@ -20,15 +20,13 @@ class ClockBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return CustomPaint(
       painter: RadialPainter(
         angleRadians: seconds * radiansPerTick,
         thickness: 5.0,
         position: 0.9,
-        colors: [
-          Colors.red,
-          Colors.blue,
-        ],
+        colors: getSecondsColor(isDark),
       ),
       //Minute Radial
       child: CustomPaint(
@@ -36,10 +34,7 @@ class ClockBody extends StatelessWidget {
           position: 0.8,
           angleRadians: _now.minute * radiansPerTick,
           thickness: 8.0,
-          colors: [
-            Colors.red,
-            Colors.blue,
-          ],
+          colors: getMinutesColor(isDark),
         ),
         //Hour Radial
         child: CustomPaint(
@@ -48,10 +43,7 @@ class ClockBody extends StatelessWidget {
             angleRadians: toHour(_now.hour) * radiansPerHour +
                 (_now.minute / 60) * radiansPerHour,
             thickness: 11.0,
-            colors: [
-              Colors.red,
-              Colors.blue,
-            ],
+            colors: getHoursColor(isDark),
           ),
           child: Center(
             child: Row(
@@ -62,7 +54,6 @@ class ClockBody extends StatelessWidget {
                 Text(
                   '${timeFormatter(model.is24HourFormat ? _now.hour : toHour(_now.hour))} : ${timeFormatter(_now.minute)}',
                   style: TextStyle(
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: MediaQuery.of(context).size.width / 20),
                 ),
