@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
-import 'package:ninja_clock/clock_body.dart';
+import 'package:ninja_clock/components/clock_body.dart';
+import 'package:ninja_clock/components/weather_details.dart';
+import 'package:ninja_clock/components/weather_tile.dart';
 
 class MyClock extends StatefulWidget {
   final ClockModel model;
@@ -11,19 +14,27 @@ class MyClock extends StatefulWidget {
   _MyClockState createState() => _MyClockState();
 }
 
-class _MyClockState extends State<MyClock> {
+class _MyClockState extends State<MyClock> with SingleTickerProviderStateMixin {
   var _now = DateTime.now();
   var _temperature = '';
-  var _temperatureRange = '';
+  var _temperatureLow = '';
+  var _temperatureHigh = '';
   var _condition = '';
   var _location = '';
   Timer _timer;
+  AnimationController controller;
+  Animation secondsAnimation;
+  Tween<double> secondsTween;
 
   @override
   void initState() {
     super.initState();
     widget.model.addListener(_updateModel);
-    // Set the initial values.
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 25),
+    );
+    secondsTween = Tween<double>();
     _updateTime();
     _updateModel();
   }
@@ -41,27 +52,32 @@ class _MyClockState extends State<MyClock> {
   void dispose() {
     _timer?.cancel();
     widget.model.removeListener(_updateModel);
+    controller.dispose();
     super.dispose();
   }
 
   void _updateModel() {
     setState(() {
       _temperature = widget.model.temperatureString;
-      _temperatureRange = '(${widget.model.low} - ${widget.model.highString})';
+      _temperatureLow = widget.model.lowString;
+      _temperatureHigh = widget.model.highString;
       _condition = widget.model.weatherString;
       _location = widget.model.location;
     });
   }
 
-  
-
   void _updateTime() {
     setState(() {
+      secondsTween.begin = (_now.second + _now.millisecond / 1000) ?? 0.0;
       _now = DateTime.now();
-      // Update once per second. Make sure to do it at the beginning of each
-      // new second, so that the clock is accurate.
+      secondsTween.end = (_now.second + _now.millisecond / 1000).toDouble();
+      secondsAnimation = secondsTween.animate(CurvedAnimation(
+        parent: controller,
+        curve: Curves.linear,
+      ));
+      controller.forward();
       _timer = Timer(
-        Duration(seconds: 1) - Duration(milliseconds: _now.millisecond),
+        Duration(milliseconds: 50),
         _updateTime,
       );
     });
@@ -71,9 +87,31 @@ class _MyClockState extends State<MyClock> {
   Widget build(BuildContext context) {
     return Container(
       color: Color(0xff0B0B1B),
-      //Second Radial
-      child: ClockBody(now: _now, model: widget.model,),
+      child: Stack(
+        children: <Widget>[
+          ClockBody(
+            now: _now,
+            model: widget.model,
+            seconds: secondsAnimation.value,
+          ),
+          WeatherDetails(
+            temperature: _temperature,
+            temperatureHigh: _temperatureHigh,
+            temperatureLow: _temperatureLow,
+            condition: _condition,
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: WeatherTile(
+              leading: Icon(
+                Icons.location_on,
+              ),
+              title: _location,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
-
