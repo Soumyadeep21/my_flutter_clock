@@ -32,7 +32,7 @@ class _MyClockState extends State<MyClock> with SingleTickerProviderStateMixin {
     widget.model.addListener(_updateModel);
     controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 25),
+      duration: Duration(milliseconds: 5),
     );
     secondsTween = Tween<double>();
     _updateTime();
@@ -77,7 +77,7 @@ class _MyClockState extends State<MyClock> with SingleTickerProviderStateMixin {
       ));
       controller.forward();
       _timer = Timer(
-        Duration(milliseconds: 50),
+        Duration(milliseconds: 25),
         _updateTime,
       );
     });

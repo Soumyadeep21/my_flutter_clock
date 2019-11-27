@@ -18,18 +18,27 @@ class RadialPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Offset center = Offset(size.width / 2, size.height / 2);
-    Paint paint = Paint()
+    //Total path of the circle if required
+    // Paint paint = Paint()
+    //   ..color = colors[0].withOpacity(0.07)
+    //   ..strokeCap = StrokeCap.round
+    //   ..style = PaintingStyle.stroke
+    //   ..strokeWidth = thickness;
+    // canvas.drawCircle(center, size.shortestSide * 0.5 * position, paint);
+    //Time Progress Paint
+    Paint progressPaint = Paint()
       ..shader = LinearGradient(colors: colors).createShader(Rect.fromCircle(
           center: center, radius: size.shortestSide * 0.5 * position))
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
       ..strokeWidth = thickness;
     canvas.drawArc(
-      Rect.fromCircle(center: center, radius: size.shortestSide * 0.5 * position),
+      Rect.fromCircle(
+          center: center, radius: size.shortestSide * 0.5 * position),
       math.radians(-90),
       angleRadians,
       false,
-      paint,
+      progressPaint,
     );
   }
 
